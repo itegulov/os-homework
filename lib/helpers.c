@@ -27,7 +27,6 @@ ssize_t write_(int fd, const void *buf, size_t count) {
 }
 
 ssize_t read_until(int fd, void *buf, size_t count, char delimiter) {
-    size_t offset = 0;
     ssize_t cnt = 0;
     char *chars = (char *) buf;
     for (size_t offset = 0;;offset++) {
@@ -36,7 +35,7 @@ ssize_t read_until(int fd, void *buf, size_t count, char delimiter) {
             return -1;
         if (cnt == 0)
             return 0;
-        if (chars[offset] == delimeter || offset + 1 == count)
+        if (chars[offset] == delimiter || offset + 1 == count)
             return count;
     }
 }
