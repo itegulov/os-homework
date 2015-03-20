@@ -30,7 +30,7 @@ ssize_t read_until(int fd, void *buf, size_t count, char delimiter) {
     ssize_t cnt = 0;
     char *chars = (char *) buf;
     for (size_t offset = 0;;) {
-        cnt = read_(fd, buf + offset, 1);
+        cnt = read(fd, buf + offset, 1);
         if (cnt == -1)
             return -1;
         if (cnt == 0)
@@ -45,16 +45,24 @@ ssize_t read_until_word(int fd, void *buf, size_t count, char *word, size_t word
 	ssize_t matched = 0;
 	char *chars = (char *) buf;
 	for (size_t offset = 0;;) {
-		cnt = read_(fd, buf + offset, word_length - matched);
+		cnt = read_(fd, buf + offset, 1);
 		if (cnt == -1)
 				return -1;
 		if (cnt == 0)
 			return offset;
-		for (int i = 0; i < cnt; i++) {
-			if (chars[offset++] == word[matched]) {
-				matched++;
-			} else {
-				matched = 0;
+		if (chars[offset++] == word[matched]) {
+			matched++;
+		} else {
+			matched = 0;
+			if (offset >= word_length) {
+				offset -= word_length;
+				for (int i = 0; i < word_length; i++) {
+					if (chars[offset++] == word[matched]) {
+						matched++;
+					} else {
+						break;
+					}
+				}
 			}
 		}
 		if (matched == word_length) {

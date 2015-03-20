@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
 	ssize_t length = strlen(word);
 	while(1) {
 		ssize_t cnt = read_until_word(STDIN_FILENO, buf, BUF_SIZE, word, length);
+		buf[cnt] = '\0';
 		if (cnt == -1)
 			return EXIT_FAILURE;
 		if (cnt == 0)
@@ -23,7 +24,7 @@ int main(int argc, char **argv) {
 		if (cnt >= length) {
 			int matched = 1;
 			for (ssize_t i = 0; i < length; i++) {
-				if (buf[cnt - length + i] != word[i]) {
+				if (buf[cnt - length + i + 1] != word[i]) {
 					matched = 0;
 					break;
 				}
