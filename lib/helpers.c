@@ -60,7 +60,7 @@ ssize_t read_until_word(int fd, void *buf, size_t count, char *word, size_t word
 					if (chars[offset + i] == word[matched]) {
 						matched++;
 					} else {
-						break;
+						matched = 0;
 					}
 				}
 				offset += word_length;
