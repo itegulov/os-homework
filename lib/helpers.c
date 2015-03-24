@@ -58,5 +58,10 @@ int spawn(const char * file, char * const argv[]) {
 		perror("error on waiting");
 		return -1;
 	}
-	return WEXITSTATUS(result);
+	if (WIFEXITED(result)) {
+		return WEXITSTATUS(result);
+	} else {
+		perror("file didn't exited normally");
+		return -1;
+	}
 }
