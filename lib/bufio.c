@@ -4,9 +4,7 @@
 
 struct buf_t *buf_new(size_t capacity) {
 	buf_t *rv = (buf_t *) malloc(sizeof(size_t) * 2 + capacity);
-	if (rv == NULL) {
-		return NULL;
-	}
+	if (rv == NULL) return NULL;
 	rv->size = 0;
 	rv->capacity = capacity;
 	return rv;
@@ -35,17 +33,12 @@ ssize_t buf_fill(fd_t fd, buf_t *buf, size_t required) {
 	if (buf == NULL) abort();
 	#endif
 	char *chars = (char *) (buf + 2 * sizeof(size_t));
-
-	while (buf->size < required) {
-		ssize_t res = read(fd, chars + buf->size, buf->capacity - buf->size);
-		if (res < 0) {
-			return -1;
-		}
-		if (res == 0) {
-			return buf->size;
-		}
+	ssize_t res = 0;
+	do {
+		res = read(fd, chars + buf->size, buf->capacity - buf->size);
+		if (res < 0) return -1;
 		buf->size += res;
-	}
+	} while (buf->size < required && res > 0);
 	return buf->size;
 }
 
