@@ -1,7 +1,6 @@
 #include "bufio.h"
 #include "stdlib.h"
 #include "string.h"
-#include "assert.h"
 
 struct buf_t *buf_new(size_t capacity) {
 	buf_t *rv = (buf_t *) malloc(sizeof(size_t) * 2 + capacity);
@@ -18,17 +17,23 @@ void buf_free(struct buf_t *buf) {
 }
 
 size_t buf_capacity(buf_t *buf) {
-	assert(buf != NULL);
+	#ifdef DEBUG
+	if (buf == NULL) abort();
+	#endif
 	return buf->capacity;
 }
 
 size_t buf_size(buf_t *buf) {
-	assert(buf != NULL);
+	#ifdef DEBUG
+	if (buf == NULL) abort();
+	#endif
 	return buf->size;
 }
 
 ssize_t buf_fill(fd_t fd, buf_t *buf, size_t required) {
-	assert(buf != NULL);
+	#ifdef DEBUG
+	if (buf == NULL) abort();
+	#endif
 	char *chars = (char *) (buf + 2 * sizeof(size_t));
 
 	while (buf->size < required) {
@@ -45,7 +50,9 @@ ssize_t buf_fill(fd_t fd, buf_t *buf, size_t required) {
 }
 
 ssize_t buf_flush(fd_t fd, buf_t *buf, size_t required) {
-	assert(buf != NULL);
+	#ifdef DEBUG
+	if (buf == NULL) abort();
+	#endif
 	char *chars = (char *) (buf + 2 * sizeof(size_t));
 
 	size_t offset = 0;
