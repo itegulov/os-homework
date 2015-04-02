@@ -8,6 +8,7 @@ typedef int fd_t;
 typedef struct buf_t {
 	size_t size;
 	size_t capacity;
+	char *chars;
 } buf_t;
 
 struct buf_t *buf_new(size_t capacity);

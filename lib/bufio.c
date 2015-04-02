@@ -3,14 +3,20 @@
 #include "string.h"
 
 struct buf_t *buf_new(size_t capacity) {
-	buf_t *rv = (buf_t *) malloc(sizeof(size_t) * 2 + capacity);
-	if (rv == NULL) return NULL;
-	rv->size = 0;
-	rv->capacity = capacity;
-	return rv;
+	buf_t *buf = (buf_t *) malloc(sizeof(buf_t));
+	if (buf == NULL) return NULL;
+	buf->chars = (char *) malloc(capacity);
+	if (buf->chars == NULL) {
+		free(buf);
+		return NULL;
+	}
+	buf->size = 0;
+	buf->capacity = capacity;
+	return buf;
 }
 
 void buf_free(struct buf_t *buf) {
+	free(buf->chars);
 	free(buf);
 }
 
@@ -32,7 +38,7 @@ ssize_t buf_fill(fd_t fd, buf_t *buf, size_t required) {
 	#ifdef DEBUG
 	if (buf == NULL) abort();
 	#endif
-	char *chars = (char *) (buf + 2 * sizeof(size_t));
+	char *chars = buf->chars;
 	ssize_t res = 0;
 	do {
 		res = read(fd, chars + buf->size, buf->capacity - buf->size);
@@ -46,7 +52,7 @@ ssize_t buf_flush(fd_t fd, buf_t *buf, size_t required) {
 	#ifdef DEBUG
 	if (buf == NULL) abort();
 	#endif
-	char *chars = (char *) (buf + 2 * sizeof(size_t));
+	char *chars = buf->chars;
 
 	size_t offset = 0;
 	while (buf->size > 0 && offset < required) {
