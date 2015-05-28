@@ -20,7 +20,6 @@ int main(int argc, char *argv[]) {
 	for (;;) {
 		write_(STDOUT_FILENO, "$", 1);
 		ssize_t res = buf_getline(STDIN_FILENO, buffota, '\n', buf);
-		printf("%d\n", res);
 		if (res < 0) {
 			if (errno == EINTR) {
 				continue;
@@ -39,14 +38,11 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		printf("%d\n", programs);
-
 		execargs_t e[programs];
 		execargs_t* ep[programs];
 		ssize_t last_pos = 0;
 		int cnt = 0;
 		for (ssize_t i = 0; i <= res; i++) {
-			printf("DEBUG: %c\n", buf[i]);
 			if (buf[i] == 0) {
 				int args = (buf[i - 1] != ' ');
 				ssize_t last_space = last_pos - 1;
@@ -71,7 +67,6 @@ int main(int argc, char *argv[]) {
 						last_arg = j + 1;
 					}
 				}
-				printf("KUDAH KUKAREK: %d %s\n", args, proc_args[0]);
 
 				if (!(e[cnt++] = new_execargs(proc_args))) {
 					for (int j = 0; j < cnt - 1; j++) {
@@ -86,9 +81,9 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		printf("RUNNING\n");
-		runpiped(ep, programs);
-		printf("RUNNED\n");
+		if (runpiped(ep, programs)) {
+			write_(STDOUT_FILENO, "runpiped error\n", 15);
+		}
 
 		for (int i = 0; i < programs; i++) {
 			free_execargs(e[i]);
