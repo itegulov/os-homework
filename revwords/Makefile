@@ -1,6 +1,6 @@
 all: revwords
 revwords:
-	gcc -std=c99 -I../lib -L../lib -o revwords revwords.c -lhelpers
+	gcc -std=c99 -I../lib -L../lib -o revwords.out revwords.c -lhelpers
 
 clean:
-	rm -f ./revwords
+	rm -f ./revwords.out

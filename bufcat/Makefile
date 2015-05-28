@@ -1,7 +1,7 @@
 all: bufcat
 
 bufcat:
-	gcc -std=c99 -I../lib -L../lib -o bufcat bufcat.c -lbufio
+	gcc -std=c99 -I../lib -L../lib -o bufcat.out bufcat.c -lbufio
 
 clean:
-	rm -f ./bufcat
+	rm -f ./bufcat.out
