@@ -1,5 +1,5 @@
-#include "bufio.h"
-#include "stdlib.h"
+#include <bufio.h>
+#include <stdlib.h>
 
 int main() {
 	buf_t *buf = buf_new(4096);

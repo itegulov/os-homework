@@ -1,6 +1,6 @@
 #include "bufio.h"
-#include "stdlib.h"
-#include "string.h"
+#include <stdlib.h>
+#include <string.h>
 
 struct buf_t *buf_new(size_t capacity) {
 	buf_t *buf = (buf_t *) malloc(sizeof(buf_t));

@@ -1,7 +1,6 @@
-#include "stdio.h"
-#include "stdlib.h"
-
-#include "helpers.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <helpers.h>
 
 #define BUF_SIZE 4096
 

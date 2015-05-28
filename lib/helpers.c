@@ -4,7 +4,7 @@
 #include <sys/types.h>
 
 ssize_t read_(int fd, void *buf, size_t count) {
-    size_t cnt = 0;
+    ssize_t cnt = 0;
     ssize_t offset = 0;
     do {
         cnt = read(fd, buf + offset, count);
