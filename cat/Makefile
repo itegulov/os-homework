@@ -1,4 +1,4 @@
 all:
-	gcc -L../lib -I../lib cat.c -o cat.out -lhelpers
+	gcc -L../lib -I../lib cat.c -o cat -lhelpers
 clean:
-	rm -f cat.out
+	rm -f cat
