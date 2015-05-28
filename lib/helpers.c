@@ -175,7 +175,8 @@ int runpiped(execargs_t** args, size_t n) {
 
 	siginfo_t info;
 	int killed = 0;
-	while (1) {
+	int killed_all = 0;
+	while (!killed_all) {
 		sigwaitinfo(&mask, &info);
 		if (info.si_signo == SIGINT) {
 			break;
@@ -192,6 +193,7 @@ int runpiped(execargs_t** args, size_t n) {
 				}
 				killed++;
 				if (killed == n) {
+					killed_all = 1;
 					break;
 				}
 			}
