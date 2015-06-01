@@ -9,17 +9,18 @@
 
 void print_line(int sig) {
 	write_(STDOUT_FILENO, "\n", 1);
+	signal(SIGINT, print_line);
 }
 
 int main(int argc, char *argv[]) {
 	char buf[BUF_SIZE];
 
-	buf_t *buffota = buf_new(BUF_SIZE);
+	buf_t *buff = buf_new(BUF_SIZE);
 	signal(SIGINT, print_line);
 
 	for (;;) {
 		write_(STDOUT_FILENO, "$", 1);
-		ssize_t res = buf_getline(STDIN_FILENO, buffota, '\n', buf);
+		ssize_t res = buf_getline(STDIN_FILENO, buff, '\n', buf);
 		if (res < 0) {
 			if (errno == EINTR) {
 				continue;
@@ -72,7 +73,7 @@ int main(int argc, char *argv[]) {
 					for (int j = 0; j < cnt - 1; j++) {
 						free_execargs(e[j]);
 					}
-					write_(STDOUT_FILENO, "Out of memory\n", 14);
+					write_(STDOUT_FILENO, "Ran out of memory\n", 14);
 					break;
 				} else {
 					ep[cnt - 1] = e + cnt - 1;

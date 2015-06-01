@@ -82,28 +82,19 @@ execargs_t new_execargs(char** args) {
 	for (char** i = args; *i != NULL; i++) {
 		cnt++;
 	}
-	cnt++;
 	char** res = (char**) malloc(cnt * sizeof(void*));
 	if (res == NULL) {
 		return NULL;
 	}
 	for (int i = 0; i < cnt; i++) {
-		if (args[i] == NULL) {
-			res[i] = NULL;
-			continue;
-		}	
-
-		size_t len = strlen(args[i]);
-		char* str = malloc(len + 1);
-		if (str == NULL) {
+		res[i] = strdup(args[i]);
+		if (res[i] == NULL) {
 			for (int j = 0; j < i; j++) {
 				free(res[j]);
 			}
 			free(res);
 			return NULL;
 		}
-		memcpy(str, args[i], len + 1);
-		res[i] = str;
 	}
 	return res;
 }
