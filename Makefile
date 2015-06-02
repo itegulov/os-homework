@@ -1,4 +1,4 @@
-SUBDIRS = lib cat filter revwords bufcat simplesh filesender
+SUBDIRS = lib cat filter revwords bufcat simplesh filesender bipiper
 .PHONY: all clean $(SUBDIRS)
 
 all: $(SUBDIRS)
