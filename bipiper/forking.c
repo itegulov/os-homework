@@ -16,14 +16,27 @@
 #define LISTEN_CNT 10
 
 int bind_and_listen(struct addrinfo* host) {
-	int sock = socket(host->ai_family, SOCK_STREAM, IPPROTO_TCP);
-	if (sock < 0) {
-		return -1;
-	}
-	if (bind(sock, host->ai_addr, host->ai_addrlen)) {
-		return -1;
+	int sock;
+	struct addrinfo* rp;
+	for (rp = host; rp != NULL; rp = rp->ai_next) {
+		sock = socket(host->ai_family, SOCK_STREAM, IPPROTO_TCP);
+		if (sock < 0) {
+			continue;
+		}
+		int one = 1;
+
+		if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(int)) == -1) {
+			close(sock);
+			continue;
+		}
+		if (bind(sock, host->ai_addr, host->ai_addrlen)) {
+			close(sock);
+			continue;
+		}
+		break;
 	}
 	if (listen(sock, LISTEN_CNT)) {
+		close(sock);
 		return -1;
 	}
 	return sock;

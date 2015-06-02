@@ -32,21 +32,32 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	int sock = socket(host->ai_family, SOCK_STREAM, IPPROTO_TCP);
-	if(sock < 0) {
-		perror("socket");
-		return EXIT_FAILURE;
+	struct addrinfo *rp;
+	int sock;
+
+	for (rp = host; rp != NULL; rp = rp->ai_next) {
+		sock = socket(rp->ai_family, SOCK_STREAM, IPPROTO_TCP);
+		if(sock < 0) {
+			continue;
+		}
+
+		int one = 1;
+
+		if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(int)) == -1) {
+			close(sock);
+			continue;
+		}
+
+		if(bind(sock, rp->ai_addr, rp->ai_addrlen)) {
+			close(sock);
+			continue;
+		}
+		
+		break;
 	}
 
-	int one = 1;
-
-	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(int)) == -1) {
-		perror("setsockopt");
-		return EXIT_FAILURE;
-	}
-
-	if(bind(sock, host->ai_addr, host->ai_addrlen)) {
-		perror("bind");
+	if (rp == NULL) {
+		printf("couldn't bind to address");
 		return EXIT_FAILURE;
 	}
 
