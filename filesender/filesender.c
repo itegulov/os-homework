@@ -25,12 +25,14 @@ int main(int argc, char** argv) {
 	struct addrinfo *host;
 	struct addrinfo hints;
 	memset(&hints, 0, sizeof(struct addrinfo));
-	if (getaddrinfo("localhost", argv[1], 0, &host)) {
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	if (getaddrinfo("localhost", argv[1], &hints, &host)) {
 		perror("getaddrinfo");
 		return EXIT_FAILURE;
 	}
 
-	int sock = socket(host->ai_family, SOCK_STREAM, 0);
+	int sock = socket(host->ai_family, SOCK_STREAM, IPPROTO_TCP);
 	if(sock < 0) {
 		perror("socket");
 		return EXIT_FAILURE;
