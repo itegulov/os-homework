@@ -1,15 +1,12 @@
-all:
-	make -C lib/
-	make -C bufcat/
-	make -C cat/
-	make -C revwords/
-	make -C filter/
-	make -C simplesh//
+SUBDIRS = lib cat filter revwords bufcat simplesh filesender
+.PHONY: all clean $(SUBDIRS)
+
+all: $(SUBDIRS)
+
+$(SUBDIRS):
+	make -C $@
 
 clean:
-	make clean -C lib/
-	make clean -C bufcat/
-	make clean -C cat/
-	make clean -C revwords/
-	make clean -C filter/
-	make clean -C simplesh/
+	for sd in $(SUBDIRS); do \
+		make -C $$sd clean; \
+	done

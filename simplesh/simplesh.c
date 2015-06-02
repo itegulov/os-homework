@@ -43,6 +43,7 @@ int main(int argc, char *argv[]) {
 		execargs_t* ep[programs];
 		ssize_t last_pos = 0;
 		int cnt = 0;
+		int ok = 1;
 		for (ssize_t i = 0; i <= res; i++) {
 			if (buf[i] == 0) {
 				int args = (buf[i - 1] != ' ');
@@ -74,12 +75,17 @@ int main(int argc, char *argv[]) {
 						free_execargs(e[j]);
 					}
 					write_(STDOUT_FILENO, "Ran out of memory\n", 14);
+					ok = 0;
 					break;
 				} else {
 					ep[cnt - 1] = e + cnt - 1;
 				}
 				last_pos = i + 1;
 			}
+		}
+
+		if (!ok) {
+			continue;
 		}
 
 		if (runpiped(ep, programs)) {
