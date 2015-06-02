@@ -65,6 +65,7 @@ int proccess(int fd1, int fd2) {
 			return -1;
 		}
 	}
+	return 0;
 }
 
 int main(int argc, char** argv) {
