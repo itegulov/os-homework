@@ -35,6 +35,11 @@ int bind_and_listen(struct addrinfo* host) {
 		}
 		break;
 	}
+
+	if (rp == NULL) {
+		return -1;
+	}
+
 	if (listen(sock, LISTEN_CNT)) {
 		close(sock);
 		return -1;
@@ -96,22 +101,18 @@ int main(int argc, char** argv) {
 	freeaddrinfo(host1);
 	freeaddrinfo(host2);
 
-	printf("Sockets %d and %d are listened now\n", sock1, sock2);
-
 	while (1) {
 		int fd1 = accept(sock1, 0, 0);
 		if (fd1 < 0) {
 			perror("accept");
 			continue;
 		}
-		printf("Accepted first client %d\n", fd1);
 		int fd2 = accept(sock2, 0, 0);
 		if (fd2 < 0) {
 			close(fd1);
 			perror("accept");
 			continue;
 		}
-		printf("Accepted second client %d\n", fd2);
 		pid_t pid1 = fork();
 		if (pid1 < 0) {
 			close(fd1);
