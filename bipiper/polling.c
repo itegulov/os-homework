@@ -16,10 +16,10 @@
 
 #define BUF_SIZE 4096
 #define LISTEN_CNT 10
-#define CONNECT_CNT 300
+#define CONNECT_CNT 127
 
-struct pollfd pfd[CONNECT_CNT];
-buf_t* pbuf[CONNECT_CNT];
+struct pollfd pfd[2 + CONNECT_CNT * 2];
+buf_t* pbuf[CONNECT_CNT * 2];
 int pfd_cnt = 0;
 int current = 0;
 
@@ -55,25 +55,21 @@ int bind_and_listen(struct addrinfo* host) {
 	return sock;
 }
 
-int proccess(int fd1, int fd2) {
-	buf_t* buf = buf_new(BUF_SIZE);
-	if (!buf) {
-		perror("buf_new");
-		return -1;
+void close_pair(int i) {
+	if (pfd_cnt == 2 * CONNECT_CNT)
+		pfd[current].events = POLLIN;
+	close(pfd[i + 2].fd);
+	close(pfd[(i + 2) ^ 1].fd);
+	buf_free(pbuf[i]);
+	buf_free(pbuf[i ^ 1]);
+	if (pfd_cnt > 3) {
+		i &= ~1;
+		pfd[i + 2] = pfd[pfd_cnt];
+		pfd[i + 3] = pfd[pfd_cnt + 1];
+		pbuf[i] = pbuf[pfd_cnt - 2];
+		pbuf[i + 1] = pbuf[pfd_cnt - 1];
 	}
-	while (1) {
-		int off = buf_fill(fd1, buf, 1);
-		if (off < 0) {
-			buf_flush(fd2, buf, buf_size(buf));
-			return -1;
-		}
-		if (off == 0) break;
-		if (buf_flush(fd2, buf, buf_size(buf)) < 0) {
-			perror("buf_flush");
-			return -1;
-		}
-	}
-	return 0;
+	pfd_cnt -= 2;
 }
 
 int main(int argc, char** argv) {
@@ -136,7 +132,8 @@ int main(int argc, char** argv) {
 				pfd[pfd_cnt + 2].fd = new_fd;
 				pfd_cnt++;
 				current ^= 1;
-				pfd[current].events = POLLIN;
+				if (pfd_cnt < 2 * CONNECT_CNT)
+					pfd[current].events = POLLIN;
 			}
 		}
 		for (int i = 0; i < pfd_cnt; i++) {
@@ -158,6 +155,28 @@ int main(int argc, char** argv) {
 						pfd[i + 2].events &= ~POLLIN;
 					if (old == 0 && buf_size(pbuf[i]) > 0) // Have some data to write now
 						pfd[(i + 2) ^ 1].events |= POLLOUT;
+				}
+				if (ev & POLLRDHUP) {
+					shutdown(pfd[(i + 2) ^ 1].fd, SHUT_WR);
+					pfd[(i + 2) ^ 1].events &= ~POLLOUT;
+					if (~pfd[i + 2].events & ~pfd[(i + 2) ^ 1].events) {
+						close_pair(i);
+						i |= 1;
+						continue;
+					}
+				}
+				if (ev & POLLHUP) {
+					shutdown(pfd[(i + 2) ^ 1].fd, SHUT_RD);
+					pfd[(i + 2) ^ 1].events &= ~POLLIN;
+					if (~pfd[i + 2].events & ~pfd[(i + 2) ^ 1].events) {
+						close_pair(i);
+						i |= 1;
+						continue;
+					}
+				}
+				if (ev & POLLERR) {
+					i |= 1;
+					close_pair(i);
 				}
 			}
 		}
