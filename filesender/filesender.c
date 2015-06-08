@@ -27,7 +27,8 @@ int main(int argc, char** argv) {
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
-	if (getaddrinfo("localhost", argv[1], &hints, &host)) {
+	hints.ai_flags = AI_PASSIVE;
+	if (getaddrinfo(NULL, argv[1], &hints, &host)) {
 		perror("getaddrinfo");
 		return EXIT_FAILURE;
 	}
